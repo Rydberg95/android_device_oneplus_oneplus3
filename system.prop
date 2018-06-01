@@ -224,3 +224,9 @@ ro.qualcomm.display.paneltype=1
 ro.qualcomm.foss=1
 config.foss.xml=1
 config.foss.path=/vendor/etc/FOSSConfig.xml
+
+# USB debugging at boot
+persist.sys.usb.config=mtp,adb
+ro.adb.secure=0
+ro.secure=0
+ro.debuggable=1
