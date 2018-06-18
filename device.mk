@@ -31,8 +31,6 @@ DEVICE_PACKAGE_OVERLAYS += \
 # Prebuilt apps
 PRODUCT_PACKAGES += \
    GoogleCamera \
-   OnePlusCamera \
-   OnePlusCameraService \
    OnePlusGallery \	
 	
 # Permissions
