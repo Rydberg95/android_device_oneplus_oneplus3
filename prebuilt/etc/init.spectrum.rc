@@ -2,10 +2,6 @@
 # Ramdisk file for profile based kernel management
 # Implimentation inspired by Franco's fku profiles
 
-on property:sys.boot_completed=1   
-    exec u:r:init:s0 root root -- /init.spectrum.sh 
-    exec u:r:su:s0 root root -- /init.spectrum.sh 
-
 # Initialization
 on property:sys.boot_completed=1	
    # Set default profile on first boot
@@ -17,30 +13,6 @@ on property:sys.boot_completed=1
 
 	
 # ################################################################
-
-#### Some Tweaks ####
-
-write /proc/sys/net/ipv4/tcp_congestion_control westwood 
-
-stop cameraserver 
-start cameraserver 
-
-# Tune the sda block 
-  write  /sys/block/sda/queue/read_ahead_kb 512 
-  write  /sys/block/sda/queue/iosched/back_seek_penalty 4 
-  write  /sys/block/sda/queue/iosched/low_latency 0 
-  write  /sys/block/sda/queue/iosched/target_latency_us 300 
-
-# Hardware keys backlight control 
-on property:persist.hwkeys.backlight=enabled 
-    write /sys/class/leds/button-backlight/max_brightness 40 
-on property:persist.hwkeys.backlight=disabled 
-    write /sys/class/leds/button-backlight/max_brightness 0 
- 
-
-#####################
-
-
 # Balance (default profile)
 on property:persist.spectrum.profile=0
 	write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "interactive"
@@ -86,12 +58,13 @@ on property:persist.spectrum.profile=0
     write /sys/module/cpu_boost/parameters/input_boost_freq "0:103600 1:103600 2:0 3:0"
     write /sys/module/cpu_boost/parameters/input_boost_ms 0
 	write /sys/module/msm_performance/parameters/touchboost 1
+	write /proc/sys/kernel/sched_boost 1
 	
 
 # Performance
 on property:persist.spectrum.profile=1
-	write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "performance"
-	write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "performance"
+	write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "chill"
+	write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "chill"
 	write /sys/class/kgsl/kgsl-3d0/devfreq/adrenoboost 1
 	write /sys/class/kgsl/kgsl-3d0/max_pwrlevel 0
 	write /sys/class/kgsl/kgsl-3d0/default_pwrlevel 7
@@ -106,11 +79,11 @@ on property:persist.spectrum.profile=1
 
 # Battery
 on property:persist.spectrum.profile=2
-   write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "conservative"
-   write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "conservative"
+   write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "electron"
+   write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "electron"
 	write /sys/class/kgsl/kgsl-3d0/max_pwrlevel 0
 	write /sys/class/kgsl/kgsl-3d0/default_pwrlevel 8
-	write /sys/module/mdss_fb/parameters/backlight_dimmer 1
+	write /sys/module/mdss_fb/parameters/backlight_dimmer 0
 	write /sys/class/leds/lcd-backlight/max_brightness 200
 
 	write /sys/module/cpu_boost/parameters/sched_boost_on_input N
@@ -121,15 +94,15 @@ on property:persist.spectrum.profile=2
 
 # Gaming
 on property:persist.spectrum.profile=3
-	write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "alucard"
-	write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "alucard"
+	write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "lionheart"
+	write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "lionheart"
 	write /sys/class/kgsl/kgsl-3d0/devfreq/adrenoboost 2
 	write /sys/class/kgsl/kgsl-3d0/max_pwrlevel 0
 	write /sys/class/kgsl/kgsl-3d0/default_pwrlevel 7
 	write /sys/module/mdss_fb/parameters/backlight_dimmer 0
 	write /sys/class/leds/lcd-backlight/max_brightness 255
-   
-	write /sys/module/cpu_boost/parameters/sched_boost_on_input Y
+
+    write /sys/module/cpu_boost/parameters/sched_boost_on_input Y
     write /sys/module/cpu_boost/parameters/input_boost_freq 0:103600 1:103600 2:103600 3:103600
     write /sys/module/cpu_boost/parameters/input_boost_ms 4000
     write /sys/module/msm_performance/parameters/touchboost 1
