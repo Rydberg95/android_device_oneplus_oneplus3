@@ -184,6 +184,10 @@ ro.qti.sensors.mot_detect=false
 sys.vendor.shutdown.waittime=500
 ro.build.shutdown_timeout=0
 
+# Spectrum
+spectrum.support=1
+persist.spectrum.kernel=HolyDragon
+
 # STM events
 persist.debug.coresight.config=stm-events
 persist.qfp=false

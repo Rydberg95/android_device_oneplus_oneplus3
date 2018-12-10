@@ -380,6 +380,8 @@ PRODUCT_PACKAGES += \
     init.recovery.qcom.rc \
     init.target.rc \
     init.oneplus3.rc \
+    init.spectrum.rc \
+    init.spectrum.sh \
     ueventd.qcom.rc
 
 # RCS
