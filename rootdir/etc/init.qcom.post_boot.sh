@@ -266,12 +266,12 @@ function configure_read_ahead_kb_values() {
         echo 128 > /sys/block/dm-0/queue/read_ahead_kb
         echo 128 > /sys/block/dm-1/queue/read_ahead_kb
     else
-        echo 512 > /sys/block/mmcblk0/bdi/read_ahead_kb
-        echo 512 > /sys/block/mmcblk0/queue/read_ahead_kb
-        echo 512 > /sys/block/mmcblk0rpmb/bdi/read_ahead_kb
-        echo 512 > /sys/block/mmcblk0rpmb/queue/read_ahead_kb
-        echo 512 > /sys/block/dm-0/queue/read_ahead_kb
-        echo 512 > /sys/block/dm-1/queue/read_ahead_kb
+        echo 2048 > /sys/block/mmcblk0/bdi/read_ahead_kb
+        echo 2048 > /sys/block/mmcblk0/queue/read_ahead_kb
+        echo 2048 > /sys/block/mmcblk0rpmb/bdi/read_ahead_kb
+        echo 2048 > /sys/block/mmcblk0rpmb/queue/read_ahead_kb
+        echo 2048 > /sys/block/dm-0/queue/read_ahead_kb
+        echo 2048 > /sys/block/dm-1/queue/read_ahead_kb
     fi
 }
 
@@ -3342,51 +3342,62 @@ case "$target" in
     "msm8996")
         # disable thermal hotplug to switch governor
         echo 0 > /sys/module/msm_thermal/core_control/enabled
-        # set sync wakee policy tunable
-        echo 1 > /proc/sys/kernel/sched_prefer_sync_wakee_to_waker
+        echo "disable" > /sys/devices/soc/soc:qcom,bcl/mode
+        echo 0 > /sys/devices/soc/soc:qcom,bcl/hotplug_mask
+        echo 0 > /sys/devices/soc/soc:qcom,bcl/hotplug_soc_mask
+        echo "enable" > /sys/devices/soc/soc:qcom,bcl/mode
         # configure governor settings for little cluster
         echo "interactive" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
-        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_migration_notif
-        echo 19000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
-        echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
+        echo 300 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
+        echo "22000 480000:10000 729600:32000 1228800:30000" > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
         echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
-        echo 960000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
-        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy
-        echo 80 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
-        echo 19000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
-        echo 79000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
-        echo 300000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+        echo 307200 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
+        echo -1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
+        echo "45 480000:35 652800:49 844800:60 960000:75 1113600:85 1228800:90 1401600:95 1593600:100" > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
+        echo 45000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
         echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/ignore_hispeed_on_notif
+        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_migration_notif
+        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/enable_prediction
+        echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
+        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy
+        echo 79000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
+        echo 307200 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
         # online CPU2
         echo 1 > /sys/devices/system/cpu/cpu2/online
         # configure governor settings for big cluster
         echo "interactive" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
-        echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_sched_load
+        echo 300 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/go_hispeed_load
+        echo "40000 940800:55000 1248000:33000 1632000:32000" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
+        echo 40000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_rate
+        echo 307200 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/hispeed_freq
+        echo -1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_slack
+        echo "35 729600:30 1113600:35 1248000:37 1401600:65 1632000:72 1708800:85 1824000:99 2150400:100" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/target_loads
+        echo 40000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time
+        echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/ignore_hispeed_on_notif
         echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_migration_notif
-        echo "19000 1400000:39000 1700000:39000 2100000:79000" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
-        echo 90 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/go_hispeed_load
-        echo 20000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_rate
-        echo 1248000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/hispeed_freq
+        echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/enable_prediction
+        echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_sched_load
         echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/io_is_busy
-        echo "85 1500000:90 1800000:95 2100000:99" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/target_loads
-        echo 19000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time
-        echo 39000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/max_freq_hysteresis
-        echo 300000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
-        echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/ignore_hispeed_on_notif
+        echo 79000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/max_freq_hysteresis
+        echo 307200 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
         # re-enable thermal hotplug
         echo 1 > /sys/module/msm_thermal/core_control/enabled
+        echo "disable" > /sys/devices/soc/soc:qcom,bcl/mode
+        echo 12 > /sys/devices/soc/soc:qcom,bcl/hotplug_mask
+        echo 8 > /sys/devices/soc/soc:qcom,bcl/hotplug_soc_mask
+        echo "enable" > /sys/devices/soc/soc:qcom,bcl/mode
         # input boost configuration
-        echo "0:1324800 2:1324800" > /sys/module/cpu_boost/parameters/input_boost_freq
-        echo 40 > /sys/module/cpu_boost/parameters/input_boost_ms
+        echo "0:1036800" > /sys/module/cpu_boost/parameters/input_boost_freq
+        echo 20 > /sys/module/cpu_boost/parameters/input_boost_ms
+        # touchboost configuration
+        echo 1 > /sys/module/msm_performance/parameters/touchboost
         # Setting b.L scheduler parameters
         echo 0 > /proc/sys/kernel/sched_boost
-        echo 1 > /proc/sys/kernel/sched_migration_fixup
         echo 95 > /proc/sys/kernel/sched_downmigrate
         echo 90 > /proc/sys/kernel/sched_upmigrate
         echo 400000 > /proc/sys/kernel/sched_freq_inc_notify
         echo 400000 > /proc/sys/kernel/sched_freq_dec_notify
-        echo 3 > /proc/sys/kernel/sched_spill_nr_run
+        echo 6 > /proc/sys/kernel/sched_spill_nr_run
         echo 100 > /proc/sys/kernel/sched_init_task_load
         # Enable bus-dcvs
         for cpubw in /sys/class/devfreq/*qcom,cpubw*
