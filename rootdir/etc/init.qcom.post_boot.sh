@@ -266,12 +266,12 @@ function configure_read_ahead_kb_values() {
         echo 128 > /sys/block/dm-0/queue/read_ahead_kb
         echo 128 > /sys/block/dm-1/queue/read_ahead_kb
     else
-        echo 512 > /sys/block/mmcblk0/bdi/read_ahead_kb
-        echo 512 > /sys/block/mmcblk0/queue/read_ahead_kb
-        echo 512 > /sys/block/mmcblk0rpmb/bdi/read_ahead_kb
-        echo 512 > /sys/block/mmcblk0rpmb/queue/read_ahead_kb
-        echo 512 > /sys/block/dm-0/queue/read_ahead_kb
-        echo 512 > /sys/block/dm-1/queue/read_ahead_kb
+        echo 1024 > /sys/block/mmcblk0/bdi/read_ahead_kb
+        echo 1024 > /sys/block/mmcblk0/queue/read_ahead_kb
+        echo 1024 > /sys/block/mmcblk0rpmb/bdi/read_ahead_kb
+        echo 1024 > /sys/block/mmcblk0rpmb/queue/read_ahead_kb
+        echo 1024 > /sys/block/dm-0/queue/read_ahead_kb
+        echo 1024 > /sys/block/dm-1/queue/read_ahead_kb
     fi
 }
 
@@ -3340,84 +3340,72 @@ esac
 
 case "$target" in
     "msm8996")
-        # disable thermal hotplug to switch governor
-        echo 0 > /sys/module/msm_thermal/core_control/enabled
-        # set sync wakee policy tunable
-        echo 1 > /proc/sys/kernel/sched_prefer_sync_wakee_to_waker
-        # configure governor settings for little cluster
-        echo "interactive" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
-        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_migration_notif
-        echo 19000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
-        echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
-        echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
-        echo 960000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
-        echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy
-        echo 80 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
-        echo 19000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
-        echo 79000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
-        echo 300000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-        echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/ignore_hispeed_on_notif
-        # online CPU2
-        echo 1 > /sys/devices/system/cpu/cpu2/online
-        # configure governor settings for big cluster
-        echo "interactive" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
-        echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_sched_load
-        echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_migration_notif
-        echo "19000 1400000:39000 1700000:39000 2100000:79000" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
-        echo 90 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/go_hispeed_load
-        echo 20000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_rate
-        echo 1248000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/hispeed_freq
-        echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/io_is_busy
-        echo "85 1500000:90 1800000:95 2100000:99" > /sys/devices/system/cpu/cpu2/cpufreq/interactive/target_loads
-        echo 19000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time
-        echo 39000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/max_freq_hysteresis
-        echo 300000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
-        echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/ignore_hispeed_on_notif
-        # re-enable thermal hotplug
-        echo 1 > /sys/module/msm_thermal/core_control/enabled
-        # input boost configuration
-        echo "0:1324800 2:1324800" > /sys/module/cpu_boost/parameters/input_boost_freq
-        echo 40 > /sys/module/cpu_boost/parameters/input_boost_ms
-        # Setting b.L scheduler parameters
+        # Disable sched_boost
         echo 0 > /proc/sys/kernel/sched_boost
-        echo 1 > /proc/sys/kernel/sched_migration_fixup
-        echo 95 > /proc/sys/kernel/sched_downmigrate
-        echo 90 > /proc/sys/kernel/sched_upmigrate
-        echo 400000 > /proc/sys/kernel/sched_freq_inc_notify
-        echo 400000 > /proc/sys/kernel/sched_freq_dec_notify
-        echo 3 > /proc/sys/kernel/sched_spill_nr_run
-        echo 100 > /proc/sys/kernel/sched_init_task_load
-        # Enable bus-dcvs
-        for cpubw in /sys/class/devfreq/*qcom,cpubw*
-        do
-            echo "bw_hwmon" > $cpubw/governor
-            echo 50 > $cpubw/polling_interval
-            echo 1525 > $cpubw/min_freq
-            echo "1525 5195 11863 13763" > $cpubw/bw_hwmon/mbps_zones
-            echo 4 > $cpubw/bw_hwmon/sample_ms
-            echo 34 > $cpubw/bw_hwmon/io_percent
-            echo 20 > $cpubw/bw_hwmon/hist_memory
-            echo 10 > $cpubw/bw_hwmon/hyst_length
-            echo 0 > $cpubw/bw_hwmon/low_power_ceil_mbps
-            echo 34 > $cpubw/bw_hwmon/low_power_io_percent
-            echo 20 > $cpubw/bw_hwmon/low_power_delay
-            echo 0 > $cpubw/bw_hwmon/guard_band_mbps
-            echo 250 > $cpubw/bw_hwmon/up_scale
-            echo 1600 > $cpubw/bw_hwmon/idle_mbps
-        done
-        # set idle GPU to 133 Mhz
+        # Set default schedTune value for foreground/top-app
+        echo 0 > /dev/stune/top-app/schedtune.boost
+        # Dynamic Stune Boost during sched_boost
+        echo 10 > /dev/stune/top-app/schedtune.sched_boost
+        # Stune configuration
+        echo 10 > /sys/module/cpu_boost/parameters/dynamic_stune_boost
+        echo 300 > /sys/module/cpu_boost/parameters/dynamic_stune_boost_ms
+        # Set default schedTune value for foreground/top-app
+        echo 1 > /dev/stune/foreground/schedtune.prefer_idle
+        echo 1 > /dev/stune/top-app/schedtune.prefer_idle
+        # Disable thermal hotplug to switch governor
+        echo 0 > /sys/module/msm_thermal/core_control/enabled
+        # Configure governor settings for little cluster
+        echo 1 > /sys/devices/system/cpu/cpu0/online
+        echo "schedutil" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        echo 1000 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us
+        echo 10000 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us
+        echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/schedutil/iowait_boost_enable
+        # Configure governor settings for big cluster
+        echo 1 > /sys/devices/system/cpu/cpu2/online
+        echo "schedutil" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+        echo 1000 > /sys/devices/system/cpu/cpu2/cpufreq/schedutil/up_rate_limit_us
+        echo 10000 > /sys/devices/system/cpu/cpu2/cpufreq/schedutil/down_rate_limit_us
+        echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/schedutil/iowait_boost_enable
+        # Re-enable thermal hotplug
+        echo 1 /sys/module/msm_thermal/core_control/enabled
+        # CPUFreq control
+        echo 307200 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+        echo 1593600 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+        echo 307200 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
+        echo 2342400 > sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
+        # Touchboost configuration
+        echo 0 > /sys/module/msm_performance/parameters/touchboost
+        # Input boost configuration
+        echo 1 > /sys/module/cpu_boost/parameters/input_boost_enabled
+        echo "0:844800 2:691200" > /sys/module/cpu_boost/parameters/input_boost_freq
+        echo 80 > /sys/module/cpu_boost/parameters/input_boost_ms
+        # Set thermal restrictions
+        echo 0 > /sys/kernel/msm_thermal/enabled
+        echo "1516800 2246400 41 40" > /sys/kernel/msm_thermal/zone0
+        echo "1440000 2150400 42 41" > /sys/kernel/msm_thermal/zone1
+        echo "1363200 2054400 43 42" > /sys/kernel/msm_thermal/zone2
+        echo "1363200 1977600 44 43" > /sys/kernel/msm_thermal/zone3
+        echo "1286400 1900800 45 44" > /sys/kernel/msm_thermal/zone4
+        echo "1286400 1824000 47 45" > /sys/kernel/msm_thermal/zone5
+        echo "1132800 1670400 49 47" > /sys/kernel/msm_thermal/zone6
+        echo "1056000 1363200 54 49" > /sys/kernel/msm_thermal/zone7
+        echo "902400 1056000 58 54" > /sys/kernel/msm_thermal/zone8
+        echo "844800 902400 60 58" > /sys/kernel/msm_thermal/zone9
+        echo "768000 748800 63 60" > /sys/kernel/msm_thermal/zone10
+        echo 4000 > /sys/kernel/msm_thermal/sampling_ms
+        echo 1 > /sys/kernel/msm_thermal/enabled
+        # Configure bus-dcvs
+        echo "bw_hwmon" > /sys/class/devfreq/soc:qcom,cpubw/governor
+        # Configure GPU settings
         echo 6 > /sys/class/kgsl/kgsl-3d0/default_pwrlevel
         echo 7 > /sys/class/kgsl/kgsl-3d0/default_pwrlevel
         echo 6 > /sys/class/kgsl/kgsl-3d0/min_pwrlevel
         echo 7 > /sys/class/kgsl/kgsl-3d0/min_pwrlevel
-
-        for memlat in /sys/class/devfreq/*qcom,memlat-cpu*
-        do
-            echo "mem_latency" > $memlat/governor
-            echo 10 > $memlat/polling_interval
-        done
-        echo "cpufreq" > /sys/class/devfreq/soc:qcom,mincpubw/governor
+        echo "msm-adreno-tz" > /sys/class/kgsl/kgsl-3d0/devfreq/governor
+        # Disable Serial Console
+        echo N > /sys/module/printk/parameters/console_suspend
+        # Set sync wakee policy tunable
+        echo 1 > /proc/sys/kernel/sched_prefer_sync_wakee_to_waker
 
 	soc_revision=`cat /sys/devices/soc0/revision`
 	if [ "$soc_revision" == "2.0" ]; then
