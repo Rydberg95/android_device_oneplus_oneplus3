@@ -187,6 +187,7 @@ ro.build.shutdown_timeout=0
 
 # Spectrum
 spectrum.support=1
+persist.spectrum.kernel=mcd
 
 # STM events
 persist.debug.coresight.config=stm-events
